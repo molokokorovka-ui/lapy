@@ -1029,4 +1029,57 @@ window.tildastatcookie='no';setTimeout(function(){(function(d,w,k,o,g) {var n=d.
 })();
 </script>
 
+
+
+<!-- Standalone fix: keep page position when Tilda popups open/close on mobile -->
+<style id="standalone-popup-scroll-fix">
+html.popup-scroll-locked {
+  overflow: hidden !important;
+}
+body.t-body_popupshowed {
+  height: auto !important;
+  min-height: 100vh !important;
+}
+</style>
+<script id="standalone-popup-scroll-fix-js">
+(function () {
+  var savedScrollY = 0;
+  var popupWasOpen = false;
+
+  function rememberScroll() {
+    savedScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+  }
+
+  document.addEventListener('click', function (e) {
+    var trigger = e.target.closest && e.target.closest('a[href^="#popup:"]');
+    if (trigger) {
+      rememberScroll();
+      popupWasOpen = true;
+    }
+  }, true);
+
+  document.body.addEventListener('popupShowed', function () {
+    if (!popupWasOpen) rememberScroll();
+    popupWasOpen = true;
+    document.documentElement.classList.add('popup-scroll-locked');
+  });
+
+  document.body.addEventListener('popupHidden', function () {
+    document.documentElement.classList.remove('popup-scroll-locked');
+    if (!popupWasOpen) return;
+    popupWasOpen = false;
+
+    requestAnimationFrame(function () {
+      window.scrollTo(0, savedScrollY);
+      setTimeout(function () {
+        window.scrollTo(0, savedScrollY);
+      }, 60);
+      setTimeout(function () {
+        window.scrollTo(0, savedScrollY);
+      }, 320);
+    });
+  });
+})();
+</script>
+
 </body></html>
