@@ -965,4 +965,68 @@ window.tildastatcookie='no';setTimeout(function(){(function(d,w,k,o,g) {var n=d.
   window.addEventListener('load',initFixedDogAccordions);
 })();
 </script>
+
+<!-- standalone-scroll-dog-animations -->
+<script>
+(function () {
+  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+  function getDogAnimations() {
+    return [
+      {
+        record: document.getElementById('rec2266372251'),
+        wrapper: document.getElementById('sbs-2266372251-1778865909101'),
+        motion: function () {
+          if (window.innerWidth < 640) return {x: -1, y: -56};
+          if (window.innerWidth < 1200) return {x: 5, y: -70};
+          return {x: 3, y: -124};
+        },
+        offset: 0
+      },
+      {
+        record: document.getElementById('rec2271430281'),
+        wrapper: document.getElementById('sbs-2271430281-1778782558415'),
+        motion: function () {
+          return {x: window.innerWidth < 640 ? -240 : -320, y: 0};
+        },
+        offset: 250
+      }
+    ];
+  }
+
+  let ticking = false;
+
+  function render() {
+    ticking = false;
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+
+    getDogAnimations().forEach(function (anim) {
+      if (!anim.record || !anim.wrapper) return;
+
+      const rect = anim.record.getBoundingClientRect();
+      const travel = Math.max(520, Math.min(1000, vh * 0.9));
+      const entered = vh - rect.top + anim.offset;
+      const progress = clamp(entered / travel, 0, 1);
+      const m = anim.motion();
+
+      anim.wrapper.style.transform =
+        'translate3d(' + (m.x * progress) + 'px,' + (m.y * progress) + 'px,0)';
+      anim.wrapper.style.willChange = 'transform';
+    });
+  }
+
+  function requestRender() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(render);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', render);
+  window.addEventListener('load', render);
+  window.addEventListener('scroll', requestRender, {passive: true});
+  window.addEventListener('resize', requestRender);
+})();
+</script>
+
 </body></html>
